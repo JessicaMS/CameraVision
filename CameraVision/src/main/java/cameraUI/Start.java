@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 import cameras.Camera;
 import cameras.Kinect;
 import cameras.LaptopCamera;
-import neuralnet.SceneClassifier;
+import computervision.SceneClassifier;
 
 
 class JFrameThread implements Runnable {

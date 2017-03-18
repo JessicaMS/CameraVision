@@ -202,12 +202,11 @@ public class Kinect extends J4KSDK implements Camera{
 	
 	public void registerCameraObserver(CameraObserver myObserver) {
 		cameraObservers.add(myObserver);
-		notifyOfFPS();
 	}
 	
 	public void registerFPSObserver(FPSObserver myObserver) {
 		fpsObservers.add(myObserver);
-	//	notifyOfFPS();
+		notifyOfFPS();
 	}
 
 }
