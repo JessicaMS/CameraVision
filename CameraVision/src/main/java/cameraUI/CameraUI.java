@@ -11,9 +11,9 @@ import javax.swing.JTable;
 import cameras.Camera;
 import cameras.FPSObserver;
 import cameras.Kinect;
-import neuralnet.Classification;
-import neuralnet.ClassificationsObserver;
-import neuralnet.SceneClassifier;
+import computervision.Classification;
+import computervision.ClassificationsObserver;
+import computervision.SceneClassifier;
 
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
