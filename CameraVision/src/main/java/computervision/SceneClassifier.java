@@ -11,9 +11,9 @@ public class SceneClassifier implements Runnable, CameraObserver {
 	private ArrayList<Classification> results;
 
 	private BufferedImage readNext;
-	private boolean readYet;
-	private boolean runClassifier;
-	private boolean threadRunning;
+	private volatile boolean readYet;
+	private volatile boolean runClassifier;
+	private volatile boolean threadRunning;
 	//mutex
 
 	public SceneClassifier() {
@@ -33,13 +33,21 @@ public class SceneClassifier implements Runnable, CameraObserver {
 		myObservers.add(newObserver);
 	}
 
-	public void updateBufferedImage(BufferedImage newImage) {
-		if(readYet == true) {
+
+	private synchronized boolean isReadYet() {
+		return readYet;
+	}
+
+	private synchronized void setReadYet(boolean readYet) {
+		this.readYet = readYet;
+	}
+
+	public synchronized void updateBufferedImage(BufferedImage newImage) {
+		if(isReadYet()) {
 			System.out.println("New image recvd");
 			readNext = newImage;
-			readYet = false;
+			setReadYet(false);
 		}
-
 	}
 	
 	private void resultsChanged() {
@@ -66,13 +74,11 @@ public class SceneClassifier implements Runnable, CameraObserver {
 
 	public void run() {
 		long start, elapsed;
-		threadRunning = true;
 		while(threadRunning) {
-			System.out.print(".");
-			if (runClassifier == true && readYet == false) {
+			if (runClassifier == true && !isReadYet()) {
 				start = System.currentTimeMillis();
 				results = this.myNN.doPrediction(readNext);
-				readYet = true;
+				setReadYet(true);
 				elapsed = System.currentTimeMillis()-start;
 				System.out.println("Prediction took " + elapsed + "milliseconds");
 				resultsChanged();
