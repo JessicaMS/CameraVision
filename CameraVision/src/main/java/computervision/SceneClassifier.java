@@ -5,14 +5,14 @@ import java.util.ArrayList;
 
 import cameras.CameraObserver;
 
-public class SceneClassifier implements Runnable, CameraObserver {
+public class SceneClassifier implements ImageProcessor {
 	private ResNet50 myNN; 
 	private ArrayList<ClassificationsObserver> myObservers;
 	private ArrayList<Classification> results;
 
 	private BufferedImage readNext;
 	private volatile boolean readYet;
-	private volatile boolean runClassifier;
+	private volatile boolean imageProcessing;
 	private volatile boolean threadRunning;
 	//mutex
 
@@ -25,7 +25,7 @@ public class SceneClassifier implements Runnable, CameraObserver {
 
 		readNext = null;
 		readYet = true;
-		runClassifier = false;
+		imageProcessing = false;
 		threadRunning = true;
 	}
 
@@ -60,12 +60,12 @@ public class SceneClassifier implements Runnable, CameraObserver {
 		}
 	}
 
-	public boolean isRunClassifier() {
-		return runClassifier;
+	public boolean isImageProcessing() {
+		return imageProcessing;
 	}
 
-	public void setRunClassifier(boolean runClassifier) {
-		this.runClassifier = runClassifier;
+	public void setImageProcessing(boolean runClassifier) {
+		this.imageProcessing = runClassifier;
 	}
 	
 	public void stopThread() {
@@ -75,7 +75,7 @@ public class SceneClassifier implements Runnable, CameraObserver {
 	public void run() {
 		long start, elapsed;
 		while(threadRunning) {
-			if (runClassifier == true && !isReadYet()) {
+			if (imageProcessing == true && !isReadYet()) {
 				start = System.currentTimeMillis();
 				results = this.myNN.doPrediction(readNext);
 				setReadYet(true);

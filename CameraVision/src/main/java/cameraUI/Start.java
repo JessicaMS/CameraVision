@@ -9,6 +9,8 @@ import javax.swing.JFrame;
 import cameras.Camera;
 import cameras.Kinect;
 import cameras.LaptopCamera;
+import computervision.ImageProcessor;
+import computervision.QRReader;
 import computervision.SceneClassifier;
 
 
@@ -35,20 +37,25 @@ class JFrameThread implements Runnable {
 
 public class Start {
 	private Camera myCamera;
-	private SceneClassifier myClassifier;
+	private ImageProcessor myImgProcessor;
 	private Thread classifierThread; 
 	
 	public void magic() {
 		//myCamera = new Kinect();
 		myCamera = new LaptopCamera();
-		myClassifier = new SceneClassifier();
+//		myImgProcessor = new SceneClassifier();
+		myImgProcessor = new QRReader();
 		
-		CameraUI window = new CameraUI(myCamera.getPanel(), myClassifier);
-		myClassifier.registerClassificationObserver(window);
-		myCamera.registerCameraObserver(myClassifier);
+		CameraUI window = new CameraUI(myCamera.getPanel(), myImgProcessor);
 		myCamera.registerFPSObserver(window);
 		
-		classifierThread = new Thread(myClassifier);
+		
+		if (myImgProcessor instanceof SceneClassifier) {
+			((SceneClassifier)myImgProcessor).registerClassificationObserver(window);
+		}
+		
+		myCamera.registerCameraObserver(myImgProcessor);
+		classifierThread = new Thread(myImgProcessor);
 		classifierThread.start();
 
 		JFrameThread windowThread = new JFrameThread(window.getFrame());
@@ -56,7 +63,7 @@ public class Start {
 		window.getFrame().addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
-				myClassifier.stopThread();
+				myImgProcessor.stopThread();
 				myCamera.close();
 			}
 		});
