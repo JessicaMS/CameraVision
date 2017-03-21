@@ -13,6 +13,7 @@ import cameras.FPSObserver;
 import cameras.Kinect;
 import computervision.Classification;
 import computervision.ClassificationsObserver;
+import computervision.ImageProcessor;
 import computervision.SceneClassifier;
 
 import java.awt.image.BufferedImage;
@@ -42,7 +43,7 @@ public class CameraUI implements FPSObserver, ClassificationsObserver {
 	private JLabel lblFps;
 	private JCheckBox chckbxCapture;
 	private JPanel cameraPanel;
-	private SceneClassifier myClassifier;
+	private ImageProcessor myClassifier;
 
 
 	public JFrame getFrame() {
@@ -52,7 +53,7 @@ public class CameraUI implements FPSObserver, ClassificationsObserver {
 	/**
 	 * Create the application.
 	 */
-	public CameraUI(JPanel cameraPanel, SceneClassifier myClassifier) {
+	public CameraUI(JPanel cameraPanel, ImageProcessor myClassifier) {
 		this.cameraPanel = cameraPanel;
 		this.myClassifier = myClassifier;
 		initialize();
@@ -120,9 +121,9 @@ public class CameraUI implements FPSObserver, ClassificationsObserver {
 		chckbxCapture.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				if(chckbxCapture.isSelected()) {
-					myClassifier.setRunClassifier(true);
+					myClassifier.setImageProcessing(true);
 				} else {
-					myClassifier.setRunClassifier(false);
+					myClassifier.setImageProcessing(false);
 				}
 			}
 		});
