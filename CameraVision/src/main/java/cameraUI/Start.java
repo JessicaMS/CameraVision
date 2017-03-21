@@ -38,7 +38,7 @@ class JFrameThread implements Runnable {
 public class Start {
 	private Camera myCamera;
 	private ImageProcessor myImgProcessor;
-	private Thread classifierThread; 
+	private Thread imageProcessingThread; 
 	
 	public void magic() {
 		//myCamera = new Kinect();
@@ -55,8 +55,8 @@ public class Start {
 		}
 		
 		myCamera.registerCameraObserver(myImgProcessor);
-		classifierThread = new Thread(myImgProcessor);
-		classifierThread.start();
+		imageProcessingThread = new Thread(myImgProcessor);
+		imageProcessingThread.start();
 
 		JFrameThread windowThread = new JFrameThread(window.getFrame());
 		
