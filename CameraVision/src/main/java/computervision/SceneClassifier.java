@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import cameras.CameraObserver;
 
 public class SceneClassifier implements ImageProcessor {
-	private ResNet50 myNN; 
+	//private ResNet50 myNN; 
+	private GregggResNet myNN;
 	private ArrayList<ClassificationsObserver> myObservers;
 	private ArrayList<Classification> results;
 
@@ -20,8 +21,11 @@ public class SceneClassifier implements ImageProcessor {
 		myObservers = new ArrayList<ClassificationsObserver>();
 		results = new ArrayList<Classification>();
 		
-		myNN = new ResNet50();
-		myNN.loadResNet50();
+		//myNN = new ResNet50();
+		//myNN.loadResNet50();
+		
+		myNN = new GregggResNet();
+		myNN.loadGregggResNet();
 
 		readNext = null;
 		readYet = true;

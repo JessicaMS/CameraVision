@@ -43,11 +43,11 @@ public class Start {
 	public void magic() {
 		//myCamera = new Kinect();
 		myCamera = new LaptopCamera();
-//		myImgProcessor = new SceneClassifier();
-		myImgProcessor = new QRReader();
+		myImgProcessor = new SceneClassifier();
+//		myImgProcessor = new QRReader();
 		
 		CameraUI window = new CameraUI(myCamera.getPanel(), myImgProcessor);
-		myCamera.registerFPSObserver(window);
+//		myCamera.registerFPSObserver(window);
 		
 		
 		if (myImgProcessor instanceof SceneClassifier) {
