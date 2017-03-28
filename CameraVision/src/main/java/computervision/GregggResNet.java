@@ -63,11 +63,6 @@ public class GregggResNet {
 		String modelJsonFilename = modelJsonFilepath + "signs_res.json";
 		String weightsHdf5Filename = weightsHdf5Filepath + "signs_res.h5";
 
-		//will throw an exception or just generate a warning.
-
-		/* Import VGG 16 model from separate model config JSON and weights HDF5 files.
-		 * Will not include loss layer or training configuration.
-		 */
 
 		try {
 
@@ -122,15 +117,10 @@ public class GregggResNet {
 	public ArrayList<Classification> doPrediction(BufferedImage imgInput) {
 		ArrayList<Classification> results = new ArrayList<Classification>();		
 
-		NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
+		//NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
 		INDArray imageTensor = null;
-		try {
-			imageTensor = loader.asMatrix(imgInput);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		DataNormalization scaler = new VGG16ImagePreProcessor();
+		imageTensor = Image2Tensor.image2Tensor(imgInput, 224, 224, 3);
+		DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
 		scaler.transform(imageTensor);
 		INDArray[] output = this.graphNet.output(imageTensor);
 
