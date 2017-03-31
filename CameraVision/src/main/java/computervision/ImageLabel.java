@@ -1,10 +1,10 @@
 package computervision;
 
-public class Classification {
+public class ImageLabel {
 	private String label;
 	private double probability;
 	
-	Classification(String label, double probability) {
+	ImageLabel(String label, double probability) {
 		this.setLabel(label);
 		this.setProbability(probability);
 	}

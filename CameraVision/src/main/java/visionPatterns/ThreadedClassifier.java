@@ -1,39 +1,43 @@
-package computervision;
+package visionPatterns;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import cameras.CameraObserver;
+import computervision.GregggResNet;
+import computervision.ImageLabel;
+import computervision.ImageProcessor;
+import computervision.QRReader;
+import computervision.ResNet50;
 
-public class SceneClassifier implements ImageProcessor {
-	//private ResNet50 myNN; 
-	private GregggResNet myNN;
-	private ArrayList<ClassificationsObserver> myObservers;
-	private ArrayList<Classification> results;
+public class ThreadedClassifier implements ThreadedCameraProcessor {
+	private ImageProcessor myImgProcessor;
+	
+	private ArrayList<ImageLabelObserver> myObservers;
+	private ImageLabel result;
 
 	private BufferedImage readNext;
 	private volatile boolean readYet;
 	private volatile boolean imageProcessing;
 	private volatile boolean threadRunning;
-	//mutex
+	private Thread imageProcessingThread; 
+	//mutex?
 
-	public SceneClassifier() {
-		myObservers = new ArrayList<ClassificationsObserver>();
-		results = new ArrayList<Classification>();
+	public ThreadedClassifier() {
+		myObservers = new ArrayList<ImageLabelObserver>();
+		imageProcessingThread = new Thread(this);
+		result = null;
 		
-		//myNN = new ResNet50();
-		//myNN.loadResNet50();
-		
-		myNN = new GregggResNet();
-		myNN.loadGregggResNet();
+		//myImgProcessor = new ResNet50();    //imagenet trained
+		myImgProcessor = new GregggResNet();
+		//myImgProcessor = new QRReader();
 
 		readNext = null;
 		readYet = true;
 		imageProcessing = false;
-		threadRunning = true;
+		threadRunning = false;
 	}
 
-	public void registerClassificationObserver(ClassificationsObserver newObserver) {
+	public void registerLabelObserver(ImageLabelObserver newObserver) {
 		myObservers.add(newObserver);
 	}
 
@@ -59,8 +63,8 @@ public class SceneClassifier implements ImageProcessor {
 	}
 	
 	private void notifyObservers() {
-		for(ClassificationsObserver singleObserver: myObservers) {
-			singleObserver.updatePredictions(results);
+		for(ImageLabelObserver singleObserver: myObservers) {
+			singleObserver.updatePredictions(result);
 		}
 	}
 
@@ -72,6 +76,11 @@ public class SceneClassifier implements ImageProcessor {
 		this.imageProcessing = runClassifier;
 	}
 	
+	public void startThread() {
+		threadRunning = true;
+		this.imageProcessingThread.start();
+	}
+	
 	public void stopThread() {
 		threadRunning = false;
 	}
@@ -80,8 +89,9 @@ public class SceneClassifier implements ImageProcessor {
 		long start, elapsed;
 		while(threadRunning) {
 			if (imageProcessing == true && !isReadYet()) {
+				
 				start = System.currentTimeMillis();
-				results = this.myNN.doPrediction(readNext);
+				result = this.myImgProcessor.scanImage(readNext);
 				setReadYet(true);
 				elapsed = System.currentTimeMillis()-start;
 				System.out.println("Prediction took " + elapsed + "milliseconds");

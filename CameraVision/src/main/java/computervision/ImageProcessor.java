@@ -1,12 +1,9 @@
 package computervision;
 
-import cameras.CameraObserver;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
-public interface ImageProcessor extends Runnable, CameraObserver {
-	
-	public boolean isImageProcessing();
+public interface ImageProcessor {
 
-	public void setImageProcessing(boolean runClassifier);
-	
-	public void stopThread();
+	ImageLabel scanImage(BufferedImage imgInput);
 }

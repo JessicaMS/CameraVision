@@ -1,39 +1,34 @@
 package computervision;
 
-import org.datavec.image.loader.NativeImageLoader;
-import org.deeplearning4j.nn.conf.ComputationGraphConfiguration;
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.nn.modelimport.keras.KerasModelImport;
-import org.deeplearning4j.nn.modelimport.keras.trainedmodels.Utils.ImageNetLabels;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
-import org.nd4j.linalg.dataset.api.preprocessor.VGG16ImagePreProcessor;
 import org.nd4j.linalg.factory.Nd4j;
-//import org.datavec.image.loader.CifarLoader;
 import org.nd4j.shade.jackson.databind.ObjectMapper;
-
-import Image2Tensor.Image2Tensor;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
-public class GregggResNet {
+public class GregggResNet implements ImageProcessor {
 	private static final String modelJsonFilepath = "./nnmodel/";
 	private static final String weightsHdf5Filepath = "./nnmodel/";
     private static ArrayList<String> labels = null;
 	
     private ComputationGraph graphNet = null;
 	
+    public GregggResNet() {
+    	this.loadNetwork();
+    }
 
 	//	private static Logger log = LoggerFactory.getLogger();
-	public static ArrayList<String> getLabels() {
+	public ArrayList<String> getLabels() {
         if (labels == null) {
             HashMap<String, String> jsonMap;
             try {
@@ -49,33 +44,29 @@ public class GregggResNet {
         return labels;
 }
 
-	public static String decodePredictions(INDArray predictions) {
-		String predictionDescription = "";
+	public static ArrayList<ImageLabel> decodePredictions(INDArray predictions) {
+		ArrayList<ImageLabel> results = new ArrayList<ImageLabel>();
+		//String predictionDescription = "";
 		int[] top5 = new int[5];
 		float[] top5Prob = new float[5];
 
 		int i = 0;
 		for (int batch = 0; batch < predictions.size(0); batch++) {
-			predictionDescription += "Predictions for batch ";
-			if (predictions.size(0) > 1) {
-				predictionDescription += String.valueOf(batch);
-			}
-			predictionDescription += " :";
 			INDArray currentBatch = predictions.getRow(batch).dup();
 			while (i < 5) {
 				top5[i] = Nd4j.argMax(currentBatch, 1).getInt(0, 0);
 				top5Prob[i] = currentBatch.getFloat(batch, top5[i]);
 				currentBatch.putScalar(0, top5[i], 0);
-				predictionDescription += "\n\t" + String.format("%3f", top5Prob[i] * 100) + "%, " + labels.get(top5[i]);
+				//predictionDescription += "\n\t" + String.format("%3f", top5Prob[i] * 100) + "%, " + labels.get(top5[i]);
+				results.add(new ImageLabel( labels.get(top5[i]),  top5Prob[i] * 100 ) );
 				i++;
 			}
 		}
-		return predictionDescription;
+		return results;
 	}
 
 
-
-	public void loadGregggResNet(){
+	private void loadNetwork(){
 		String modelJsonFilename = modelJsonFilepath + "signs_res.json";
 		String weightsHdf5Filename = weightsHdf5Filepath + "signs_res.h5";
 
@@ -129,37 +120,27 @@ public class GregggResNet {
 			BufferedImage imgInput = null;
 			imgInput = ImageIO.read(new File(fileDir+fileName));
 
-			INDArray imageTensor = Image2Tensor.image2Tensor(imgInput, 224, 224, 3);
-
-			long start = System.currentTimeMillis();
-			//NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
-			//INDArray imageTensor = loader.asMatrix(imgInput);
-			DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
-			scaler.transform(imageTensor);
-			//System.out.println(imageTensor);
-			INDArray[] output = graphNet.output(imageTensor);
-			System.out.println(output[0].toString());
-			System.out.println(decodePredictions(output[0]));
-			long elapsed = System.currentTimeMillis()-start;
-			System.out.println("Prediction took " + elapsed + "milliseconds");
+			scanImage(imgInput);
 
 		}
 	}
 
-	public ArrayList<Classification> doPrediction(BufferedImage imgInput) {
-		ArrayList<Classification> results = new ArrayList<Classification>();		
-
-		//NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
-		INDArray imageTensor = null;
-		imageTensor = Image2Tensor.image2Tensor(imgInput, 224, 224, 3);
+	@Override
+	public ImageLabel scanImage(BufferedImage imgInput) {
+		ArrayList<ImageLabel> results = new ArrayList<ImageLabel>();		
+		INDArray imageTensor = Image2Tensor.image2Tensor(imgInput, 224, 224, 3);
+		
 		DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
 		scaler.transform(imageTensor);
 		INDArray[] output = this.graphNet.output(imageTensor);
 
-		System.out.println(output[0]);
-		System.out.println(decodePredictions(output[0]));
-
-		return results;
+		results = (decodePredictions(output[0]));
+		System.out.println(results);
+		
+		return results.get(0);
 
 	}
+
+
+
 }

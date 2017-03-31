@@ -1,4 +1,4 @@
-package Image2Tensor;
+package computervision;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
