@@ -3,47 +3,34 @@ package cameraUI;
 
 import javax.swing.JFrame;
 import java.awt.GridBagLayout;
-import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
-import javax.swing.JTable;
-
-import cameras.Camera;
 import cameras.FPSObserver;
-import cameras.Kinect;
-import computervision.Classification;
-import computervision.ClassificationsObserver;
-import computervision.ImageProcessor;
-import computervision.SceneClassifier;
+import computervision.ImageLabel;
+import visionPatterns.ImageLabelObserver;
+import visionPatterns.ThreadedCameraProcessor;
 
-import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import javax.swing.table.DefaultTableModel;
-
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
-public class CameraUI implements FPSObserver, ClassificationsObserver {
+public class CameraUI implements FPSObserver, ImageLabelObserver {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	private JFrame frame;
-	private JTable table;
 	private static DecimalFormat df2 = new DecimalFormat("###.##");
 
 	private JLabel lblFps;
 	private JCheckBox chckbxCapture;
 	private JPanel cameraPanel;
-	private ImageProcessor myClassifier;
+	private ThreadedCameraProcessor myClassifier;
+	private JLabel lblImageLabel;
 
 
 	public JFrame getFrame() {
@@ -53,7 +40,7 @@ public class CameraUI implements FPSObserver, ClassificationsObserver {
 	/**
 	 * Create the application.
 	 */
-	public CameraUI(JPanel cameraPanel, ImageProcessor myClassifier) {
+	public CameraUI(JPanel cameraPanel, ThreadedCameraProcessor myClassifier) {
 		this.cameraPanel = cameraPanel;
 		this.myClassifier = myClassifier;
 		initialize();
@@ -97,26 +84,6 @@ public class CameraUI implements FPSObserver, ClassificationsObserver {
 		gbc_lblFps.gridy = 1;
 		frame.getContentPane().add(lblFps, gbc_lblFps);
 
-		table = new JTable();
-		table.setModel(new DefaultTableModel(
-				new Object[][] {
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-					{null, null},
-				},
-				new String[] {
-						"Label", "Prediction"
-				}
-				));
-		GridBagConstraints gbc_table = new GridBagConstraints();
-		gbc_table.insets = new Insets(0, 0, 0, 5);
-		gbc_table.fill = GridBagConstraints.HORIZONTAL;
-		gbc_table.gridx = 0;
-		gbc_table.gridy = 2;
-		frame.getContentPane().add(table, gbc_table);
-
 		chckbxCapture = new JCheckBox("Capture / Analyze");
 		chckbxCapture.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
@@ -127,6 +94,13 @@ public class CameraUI implements FPSObserver, ClassificationsObserver {
 				}
 			}
 		});
+		
+		lblImageLabel = new JLabel("Image Label");
+		GridBagConstraints gbc_lblImageLabel = new GridBagConstraints();
+		gbc_lblImageLabel.insets = new Insets(0, 0, 0, 5);
+		gbc_lblImageLabel.gridx = 0;
+		gbc_lblImageLabel.gridy = 2;
+		frame.getContentPane().add(lblImageLabel, gbc_lblImageLabel);
 		GridBagConstraints gbc_chckbxCapture = new GridBagConstraints();
 		gbc_chckbxCapture.gridx = 1;
 		gbc_chckbxCapture.gridy = 2;
@@ -138,17 +112,8 @@ public class CameraUI implements FPSObserver, ClassificationsObserver {
 	}
 
 
-	public void updatePredictions(ArrayList<Classification> predictions) {
-		DefaultTableModel model = (DefaultTableModel) table.getModel();
-		while(model.getRowCount()> 0) {
-			model.removeRow(0);
-		}
-
-		System.out.println( "Predictions for batch :");
-		for(Classification pred:  predictions) {
-			model.addRow(new Object[]{pred.getLabel(), pred.getProbability()});
-		}
-		table.setModel(model);
+	public void updatePredictions(ImageLabel scannedLabel) {
+		System.out.println(scannedLabel.toString());
 
 	}
 
