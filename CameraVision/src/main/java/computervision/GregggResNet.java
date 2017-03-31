@@ -30,12 +30,21 @@ public class GregggResNet {
 
 
 	public static String decodePredictions(INDArray predictions) {
-		ArrayList<String> labels;
+		ArrayList<String> labels = new ArrayList<String>();
 		String predictionDescription = "";
 		int[] top5 = new int[5];
 		float[] top5Prob = new float[5];
 
-		labels = ImageNetLabels.getLabels();
+		//labels = ImageNetLabels.getLabels();
+		labels.add("224"); 
+		labels.add("227-230"); 
+		labels.add("231"); 
+		labels.add("275"); 
+		labels.add("276"); 
+		labels.add("278"); 
+		labels.add("A235"); 
+		labels.add("csdept"); 
+		labels.add("rescue");
 
 		//brute force collect top 5
 		int i = 0;
@@ -76,19 +85,40 @@ public class GregggResNet {
 		System.out.println("Model Loaded and initalized");
 
 
-		//runTests(graphNet);
+//		try {
+//			runTests(graphNet);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 
 
 	}
 
-	public static void runTests(ComputationGraph graphNet) throws IOException {
-		String fileDir = "./nnmodel/";
+	public void runTests(ComputationGraph graphNet) throws IOException {
+		String fileDir = "./nnmodel/testdata/";
 		ArrayList<String> files = new ArrayList<String>();
 
 		files.add("A235_set3_203.jpg");
 		files.add("csdept_set2_276.jpg");
 		files.add("227-230_set2_542.jpg");
+		files.add("224.jpg");
+		files.add("224_near.jpg");
+		files.add("227.jpg");
+		files.add("227_far.jpg");
+		files.add("227_mid.jpg");
+		files.add("275.jpg");
+		files.add("276_close.jpg");
+		files.add("A235.jpg");
+		files.add("278_close.jpg");
+		files.add("278_far.jpg");
+		files.add("a235_close.jpg");
+		files.add("a235_mid.jpg");
+		files.add("cs_mid.jpg");
+		files.add("csdept_near.jpg");
+		files.add("rescue_close.jpg");
+		files.add("rescue_far.jpg");
 
 
 		for(String fileName :files) {
@@ -97,17 +127,15 @@ public class GregggResNet {
 
 			INDArray imageTensor = Image2Tensor.image2Tensor(imgInput, 224, 224, 3);
 
-
 			long start = System.currentTimeMillis();
 			//NativeImageLoader loader = new NativeImageLoader(224, 224, 3);
-			//NativeImageLoader loader = new NativeImageLoader(3, 224, 224);
 			//INDArray imageTensor = loader.asMatrix(imgInput);
 			DataNormalization scaler = new ImagePreProcessingScaler(0, 1);
 			scaler.transform(imageTensor);
 			//System.out.println(imageTensor);
 			INDArray[] output = graphNet.output(imageTensor);
 			System.out.println(output[0].toString());
-			//System.out.println(decodePredictions(output[0]));
+			System.out.println(decodePredictions(output[0]));
 			long elapsed = System.currentTimeMillis()-start;
 			System.out.println("Prediction took " + elapsed + "milliseconds");
 
