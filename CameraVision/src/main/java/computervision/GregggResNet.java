@@ -11,42 +11,49 @@ import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.nd4j.linalg.dataset.api.preprocessor.VGG16ImagePreProcessor;
 import org.nd4j.linalg.factory.Nd4j;
 //import org.datavec.image.loader.CifarLoader;
+import org.nd4j.shade.jackson.databind.ObjectMapper;
 
 import Image2Tensor.Image2Tensor;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
 public class GregggResNet {
 	private static final String modelJsonFilepath = "./nnmodel/";
 	private static final String weightsHdf5Filepath = "./nnmodel/";
-	ComputationGraph graphNet = null;
+    private static ArrayList<String> labels = null;
+	
+    private ComputationGraph graphNet = null;
+	
 
 	//	private static Logger log = LoggerFactory.getLogger();
-
+	public static ArrayList<String> getLabels() {
+        if (labels == null) {
+            HashMap<String, String> jsonMap;
+            try {
+                jsonMap = new ObjectMapper().readValue(new File("./nnmodel/class_index.json"), HashMap.class);
+                labels = new ArrayList<>(jsonMap.size());
+                for (int i = 0; i < jsonMap.size(); i++) {
+                    labels.add(jsonMap.get(String.valueOf(i)));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return labels;
+}
 
 	public static String decodePredictions(INDArray predictions) {
-		ArrayList<String> labels = new ArrayList<String>();
 		String predictionDescription = "";
 		int[] top5 = new int[5];
 		float[] top5Prob = new float[5];
 
-		//labels = ImageNetLabels.getLabels();
-		labels.add("224"); 
-		labels.add("227-230"); 
-		labels.add("231"); 
-		labels.add("275"); 
-		labels.add("276"); 
-		labels.add("278"); 
-		labels.add("A235"); 
-		labels.add("csdept"); 
-		labels.add("rescue");
-
-		//brute force collect top 5
 		int i = 0;
 		for (int batch = 0; batch < predictions.size(0); batch++) {
 			predictionDescription += "Predictions for batch ";
@@ -72,9 +79,8 @@ public class GregggResNet {
 		String modelJsonFilename = modelJsonFilepath + "signs_res.json";
 		String weightsHdf5Filename = weightsHdf5Filepath + "signs_res.h5";
 
-
+		this.labels = this.getLabels();
 		try {
-
 			graphNet = KerasModelImport.importKerasModelAndWeights(modelJsonFilename, weightsHdf5Filename);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -91,8 +97,6 @@ public class GregggResNet {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-
-
 
 	}
 
@@ -152,8 +156,8 @@ public class GregggResNet {
 		scaler.transform(imageTensor);
 		INDArray[] output = this.graphNet.output(imageTensor);
 
-		//results = this.decodePredictions(output[0]);
 		System.out.println(output[0]);
+		System.out.println(decodePredictions(output[0]));
 
 		return results;
 
