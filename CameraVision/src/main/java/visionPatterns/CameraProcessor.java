@@ -1,9 +1,10 @@
 package visionPatterns;
 
-import cameras.CameraObserver;
+import java.util.Observer;
+
 import computervision.ImageLabel;
 
-public interface CameraProcessor extends CameraObserver {
+public interface CameraProcessor extends Observer {
 	
 	ImageLabel scanImage();
 	

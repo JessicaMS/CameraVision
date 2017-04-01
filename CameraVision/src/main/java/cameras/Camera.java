@@ -1,7 +1,5 @@
 package cameras;
 
-import java.awt.image.BufferedImage;
-
 import javax.swing.JPanel;
 
 public interface Camera {
@@ -11,9 +9,5 @@ public interface Camera {
 	
 	public JPanel getPanel();
 	
-	public BufferedImage getImage();
-	
-	public void registerCameraObserver(CameraObserver myObserver);
-	
-	public void registerFPSObserver(FPSObserver myObserver);
+	public capturedImage getCapturedImage();
 }

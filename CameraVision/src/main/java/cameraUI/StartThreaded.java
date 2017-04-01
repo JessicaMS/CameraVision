@@ -5,18 +5,16 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
-
 import cameras.Camera;
-import cameras.Kinect;
 import cameras.LaptopCamera;
-import visionPatterns.ThreadedClassifier;
-import visionPatterns.ThreadedCameraProcessor;
+import visionPatterns.CameraProcessor;
+import visionPatterns.Classifier;
 
 
-class JFrameThread implements Runnable {
+class JFrameThread2 implements Runnable {
 	private JFrame frame;
 	
-	JFrameThread(JFrame frame) {
+	JFrameThread2(JFrame frame) {
 		setJFrame(frame);
 	}
 	
@@ -34,31 +32,24 @@ class JFrameThread implements Runnable {
 	
 }
 
-public class Start {
+public class StartThreaded {
 	private Camera myCamera;
-	private ThreadedCameraProcessor myImgProcessor;
+	private CameraProcessor cameraProcessor;
 	
 	public void magic() {
 		//myCamera = new Kinect();
 		myCamera = new LaptopCamera();
 
-		myImgProcessor = new ThreadedClassifier();
+		cameraProcessor = new Classifier(myCamera.getCapturedImage());
 		
-		CameraUI window = new CameraUI(myCamera.getPanel(), myImgProcessor);
+		CameraUI window = new CameraUI(myCamera.getPanel(), cameraProcessor);
 		
-		if (myImgProcessor instanceof ThreadedClassifier) {
-			((ThreadedClassifier)myImgProcessor).registerLabelObserver(window);
-		}
-		
-		myCamera.registerCameraObserver(myImgProcessor);
-		myImgProcessor.startThread();
 
-		JFrameThread windowThread = new JFrameThread(window.getFrame());
+		JFrameThread2 windowThread = new JFrameThread2(window.getFrame());
 		
 		window.getFrame().addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
-				myImgProcessor.stopThread();
 				myCamera.close();
 			}
 		});
@@ -68,7 +59,7 @@ public class Start {
 	}
 	
 	public static void main(String[] args) {
-		Start funtime = new Start();
+		StartThreaded funtime = new StartThreaded();
 		funtime.magic();
 	}
 }

@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
-import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -50,19 +49,17 @@ import edu.ufl.digitalworlds.j4k.VideoFrame;
 public class Kinect extends J4KSDK implements Camera{
 	private static final double updateInterval = 2.2;
 
-	private ArrayList<CameraObserver> cameraObservers;
-	private ArrayList<FPSObserver> fpsObservers;
-	
 	private ViewerPanel3D viewer=null;
 	JLabel label=null;
 	boolean mask_players=false;
-	public void maskPlayers(boolean flag){mask_players=flag;}
-	
+
+	private capturedImage lastImage;
+
 	private double timer;
 	private double elapsed;
 	private int frameCount;
 	private double FPS;
-	
+
 	public Kinect()
 	{
 		super();
@@ -71,19 +68,17 @@ public class Kinect extends J4KSDK implements Camera{
 		elapsed = 0.0;
 		frameCount = 0;
 		FPS = 0.0;
-		cameraObservers = new ArrayList<CameraObserver>();
-		fpsObservers = new ArrayList<FPSObserver>();
 	}
-	
+
 	public Kinect(byte type)
 	{
 		super(type);
 	}
-	
+
 	public void initialize() {
 		this.setDepthResolution(320, 240);
 		this.setColorResolution(640, 480);
-		
+
 		if(!this.start(J4KSDK.COLOR))
 		{
 			System.out.println("ERROR: The Kinect device could not be initialized.\n\n 1. Check if the Microsoft's Kinect SDK was succesfully installed on this computer.\n 2. Check if the Kinect is plugged into a power outlet.\n  3. Check if the Kinect is connected to a USB port of this computer.");
@@ -93,37 +88,37 @@ public class Kinect extends J4KSDK implements Camera{
 		this.viewer.setShowVideo(false);
 		this.viewer.setDrawFlatTexture(true);
 	}
-	
+
+	public void maskPlayers(boolean flag) {
+		mask_players=flag;
+	}
+
 	public void close() {
 		this.stop();
 	}
-	
+
 	public void setViewer(ViewerPanel3D viewer){this.viewer=viewer;}
-	
+
 	public void setLabel(JLabel l){this.label=l;}
-	
+
 	private boolean use_infrared=false;
-	
+
 	public void updateTextureUsingInfrared(boolean flag)
 	{
 		use_infrared=flag;
 	}
-	
+
 	public VideoFrame getVideoTexture() {
 		return viewer.getVideoFrame();
 	}
-	
-
 
 	@Override
 	public void onColorFrameEvent(byte[] data) {
-		
-		//System.out.println("Color frame event");
 		if(viewer==null || viewer.videoTexture==null || use_infrared) {
 			return;
 		}
 		viewer.videoTexture.update(getColorWidth(), getColorHeight(), data);
-		
+
 		elapsed += (System.currentTimeMillis() -timer);
 		timer = System.currentTimeMillis();
 		frameCount++;
@@ -131,39 +126,18 @@ public class Kinect extends J4KSDK implements Camera{
 		if(elapsed > updateInterval*1000.0) {
 			FPS = ((double)frameCount) / (elapsed/1000.0);
 			elapsed %= updateInterval*1000.0;
-			FPSChanged();
-			imageChanged();
+			lastImage.setCameraCapture(createBufferedImageFromData(data));
 		}
 	}
 
-	private void FPSChanged() {
-		notifyOfFPS();
-		frameCount=0;
-	}
-	
-	private void imageChanged() {
-		notifyWithImage();
-	}
-	
-	private void notifyOfFPS() {
-		for(FPSObserver myObserver : fpsObservers) {
-			myObserver.updateFPS(FPS);
-		}
-	}
-	
-	private void notifyWithImage() {
-		for(CameraObserver myObserver : cameraObservers) {
-			myObserver.updateBufferedImage(this.getImage());
-		}
-	}
 
 	public JPanel getPanel() {
-		
+
 		return (JPanel)this.viewer;
 	}
 
-	public BufferedImage getImage() {
-		byte[] imageData = getVideoTexture().getData();
+	private BufferedImage createBufferedImageFromData(byte[] imageData) {
+		//byte[] imageData = getVideoTexture().getData();
 		//System.out.println("Size of captured imageData: " + imageData.length);
 
 		byte[] RGB = new byte[getColorWidth()* getColorHeight()*3];
@@ -191,22 +165,16 @@ public class Kinect extends J4KSDK implements Camera{
 	@Override
 	public void onDepthFrameEvent(short[] arg0, byte[] arg1, float[] arg2, float[] arg3) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void onSkeletonFrameEvent(boolean[] arg0, float[] arg1, float[] arg2, byte[] arg3) {
 		// TODO Auto-generated method stub
-		
 	}
-	
-	public void registerCameraObserver(CameraObserver myObserver) {
-		cameraObservers.add(myObserver);
-	}
-	
-	public void registerFPSObserver(FPSObserver myObserver) {
-		fpsObservers.add(myObserver);
-		notifyOfFPS();
+
+	@Override
+	public capturedImage getCapturedImage() {
+		return this.lastImage;
 	}
 
 }

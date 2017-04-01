@@ -1,8 +1,10 @@
 package visionPatterns;
 
-import cameras.CameraObserver;
+import computervision.ImageLabel;
 
-public interface ThreadedCameraProcessor extends Runnable, CameraObserver {
+public interface ThreadedCameraProcessor extends Runnable {
+	
+	public ImageLabel getImageLabel();
 	
 	public boolean isImageProcessing();
 
