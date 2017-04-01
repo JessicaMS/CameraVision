@@ -1,16 +1,32 @@
 package computervision;
 
-public class ImageLabel {
-	private String label;
+import java.util.Observable;
+
+public class ImageLabel extends Observable {
+	private String labelName;
 	private double probability;
 	
-	ImageLabel(String label, double probability) {
-		this.setLabel(label);
-		this.setProbability(probability);
+	public ImageLabel() {
+		labelName = "(None)";
+		probability = 100.0;
+	}
+	
+	public ImageLabel(String labelName, double probability) {
+		this.labelName = labelName;
+		this.probability =(probability);
+	}
+	
+	/*
+	 * If label is changed, update observers
+	 */
+	public void labelChanged()
+	{
+		setChanged(); 
+		notifyObservers();
 	}
 	
 	public String toString() {
-		return String.format("%3f", probability) + "%, " + this.label; 
+		return String.format("%3f", probability) + "%, " + this.labelName; 
 	}
 
 	public double getProbability() {
@@ -21,11 +37,18 @@ public class ImageLabel {
 		this.probability = probability;
 	}
 
-	public String getLabel() {
-		return label;
+	public String getLabelName() {
+		return labelName;
+	}
+	
+	public void setLabelName(String labelName) {
+		this.labelName = labelName;
 	}
 
-	public void setLabel(String label) {
-		this.label = label;
+	public void setLabel(ImageLabel label2) {
+		this.labelName = label2.getLabelName();
+		this.probability = label2.getProbability();
+		
+		labelChanged();
 	}
 }

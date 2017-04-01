@@ -6,15 +6,15 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import computervision.ImageLabel;
-import visionPatterns.CameraProcessor;
 import java.text.DecimalFormat;
+import java.util.Observable;
+import java.util.Observer;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
 
-public class CameraUI {
+public class CameraUIObserver implements Observer {
 
 	/**
 	 * 
@@ -25,13 +25,12 @@ public class CameraUI {
 
 	private JLabel lblFps;
 	private JCheckBox chckbxCapture;
-	private Thread mainThread;
+	public JCheckBox getChckbxCapture() {
+		return chckbxCapture;
+	}
 
 	private JPanel cameraPanel;
 	private JLabel lblImageLabel;
-	private CameraProcessor cameraProcessor;
-	
-	private volatile boolean threadRunning;
 
 
 	public JFrame getFrame() {
@@ -41,15 +40,10 @@ public class CameraUI {
 	/**
 	 * Create the application.
 	 */
-	public CameraUI(JPanel cameraPanel, CameraProcessor cameraProcessor) {
-		this.cameraProcessor = cameraProcessor;
+	public CameraUIObserver(JPanel cameraPanel, Observable observable) {
 		this.cameraPanel = cameraPanel;
-		threadRunning = false;
+		observable.addObserver(this);
 		initialize();
-	}	
-
-	public JCheckBox getChckbxCapture() {
-		return chckbxCapture;
 	}
 
 	/**
@@ -92,7 +86,7 @@ public class CameraUI {
 
 		chckbxCapture = new JCheckBox("Capture / Analyze");
 
-
+		
 		lblImageLabel = new JLabel("Image Label");
 		GridBagConstraints gbc_lblImageLabel = new GridBagConstraints();
 		gbc_lblImageLabel.insets = new Insets(0, 0, 0, 5);
@@ -103,66 +97,26 @@ public class CameraUI {
 		gbc_chckbxCapture.gridx = 1;
 		gbc_chckbxCapture.gridy = 2;
 		frame.getContentPane().add(chckbxCapture, gbc_chckbxCapture);
+	}
+
+	public void updateFPS(double FPS) {
+		lblFps.setText("FPS: " + df2.format(FPS));
+	}
 
 
-		chckbxCapture.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				if(chckbxCapture.isSelected()) {
-					startThread();
-				} else {
-					stopThread();
-				}
-			}
-		});
+	public void updatePredictions(ImageLabel scannedLabel) {
 		
+
+	}
+
+	@Override
+	public void update(Observable arg0, Object arg1) {
+		if (arg0 instanceof ImageLabel) {
+			System.out.println(((ImageLabel)arg0).toString());
+		}
 		
-		this.createThread();
 	}
 
-	public void createThread() {
-		mainThread = new Thread(){
-			public void run(){
-				ImageLabel result = null;
-				String tourLocData="";
-				while(threadRunning){
-					System.out.println("scan");
-					result = cameraProcessor.scanImage();
-					if(!result.getLabelName().equals("(None)")) {
-						tourLocData=result.getLabelName();
-						System.out.println(tourLocData);
-						//							tourLocData=IC.requestTLData(tourLocData);
-						//							IC.speak(tourLocData);
-						result.setLabelName("None)");
 
-					} else {
-						System.out.println("None, sleep");
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-					
-				}
-			}
-		};
-	}
-
-	void startThread() {
-		if(threadRunning == false) {
-			System.out.println("turn on");
-			this.threadRunning = true;
-			mainThread.start();
-		}
-	}
-
-	void stopThread() {
-		if (threadRunning == true) {
-			System.out.println("turn off");
-			this.threadRunning = false;
-		}
-
-	}
 
 }

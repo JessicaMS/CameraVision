@@ -2,8 +2,6 @@ package cameras;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-
 import javax.swing.JPanel;
 
 import com.github.sarxos.webcam.Webcam;
@@ -14,12 +12,12 @@ import com.github.sarxos.webcam.WebcamListener;
 
 
 public class LaptopCamera implements Camera, WebcamListener {
-	private ArrayList<CameraObserver> cameraObservers;
 	private Webcam webcam;
 	private JPanel cameraPanel;
+	private capturedImage lastImage;
 
 	public LaptopCamera() {
-		cameraObservers = new ArrayList<CameraObserver>();
+		lastImage = new capturedImage();
 		initialize();
 	}
 
@@ -70,30 +68,9 @@ public class LaptopCamera implements Camera, WebcamListener {
 		return this.cameraPanel;
 	}
 	
-	public BufferedImage getImage() {
+	private BufferedImage getImage() {
 		return webcam.getImage();
 	}
-//	
-//	private void imageChanged() {
-//		notifyWithImage();
-//	}
-	
-//	
-//	private void notifyWithImage() {
-//
-//	}
-
-	public void registerCameraObserver(CameraObserver myObserver) {
-		cameraObservers.add(myObserver);
-	}
-	
-	@Override
-	public void registerFPSObserver(FPSObserver myObserver) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	
 
 	@Override
 	public void webcamClosed(WebcamEvent arg0) {
@@ -109,9 +86,7 @@ public class LaptopCamera implements Camera, WebcamListener {
 
 	@Override
 	public void webcamImageObtained(WebcamEvent webcamEvent) {
-		for(CameraObserver myObserver : cameraObservers) {
-			myObserver.updateBufferedImage(webcamEvent.getImage());
-		}
+		lastImage.setCameraCapture(webcamEvent.getImage());
 		
 	}
 
@@ -119,5 +94,15 @@ public class LaptopCamera implements Camera, WebcamListener {
 	public void webcamOpen(WebcamEvent arg0) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	/*
+	 *
+	 * Return handle to lastImage, allows registration as observer
+	 */
+	@Override
+	public capturedImage getCapturedImage() {
+		
+		return this.lastImage;
 	}
 }

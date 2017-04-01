@@ -1,19 +1,19 @@
 package visionPatterns;
 
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
+import cameras.capturedImage;
 import computervision.GregggResNet;
 import computervision.ImageLabel;
 import computervision.ImageProcessor;
 import computervision.QRReader;
 import computervision.ResNet50;
 
-public class ThreadedClassifier implements ThreadedCameraProcessor {
+public class ThreadedClassifier implements Observer, ThreadedCameraProcessor {
 	private ImageProcessor myImgProcessor;
-	
-	private ArrayList<ImageLabelObserver> myObservers;
-	private ImageLabel result;
+	private ImageLabel resultingLabel;
 
 	private BufferedImage readNext;
 	private volatile boolean readYet;
@@ -22,25 +22,20 @@ public class ThreadedClassifier implements ThreadedCameraProcessor {
 	private Thread imageProcessingThread; 
 	//mutex?
 
-	public ThreadedClassifier() {
-		myObservers = new ArrayList<ImageLabelObserver>();
+	public ThreadedClassifier(Observable observable) {
 		imageProcessingThread = new Thread(this);
-		result = null;
+		resultingLabel = new ImageLabel();
+		observable.addObserver(this);
 		
 		//myImgProcessor = new ResNet50();    //imagenet trained
-		myImgProcessor = new GregggResNet();
-		//myImgProcessor = new QRReader();
+		//myImgProcessor = new GregggResNet();
+		myImgProcessor = new QRReader();
 
 		readNext = null;
 		readYet = true;
 		imageProcessing = false;
 		threadRunning = false;
 	}
-
-	public void registerLabelObserver(ImageLabelObserver newObserver) {
-		myObservers.add(newObserver);
-	}
-
 
 	private synchronized boolean isReadYet() {
 		return readYet;
@@ -50,24 +45,8 @@ public class ThreadedClassifier implements ThreadedCameraProcessor {
 		this.readYet = readYet;
 	}
 
-	public synchronized void updateBufferedImage(BufferedImage newImage) {
-		if(isReadYet()) {
-			System.out.println("New image recvd");
-			readNext = newImage;
-			setReadYet(false);
-		}
-	}
-	
-	private void resultsChanged() {
-		notifyObservers();
-	}
-	
-	private void notifyObservers() {
-		for(ImageLabelObserver singleObserver: myObservers) {
-			singleObserver.updatePredictions(result);
-		}
-	}
 
+	
 	public boolean isImageProcessing() {
 		return imageProcessing;
 	}
@@ -91,15 +70,32 @@ public class ThreadedClassifier implements ThreadedCameraProcessor {
 			if (imageProcessing == true && !isReadYet()) {
 				
 				start = System.currentTimeMillis();
-				result = this.myImgProcessor.scanImage(readNext);
+				resultingLabel.setLabel(this.myImgProcessor.scanImage(readNext));
 				setReadYet(true);
 				elapsed = System.currentTimeMillis()-start;
 				System.out.println("Prediction took " + elapsed + "milliseconds");
-				resultsChanged();
+
 			}
 		}
 
 
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		if (o instanceof capturedImage) {
+			if(isReadYet()) {
+				System.out.println("New image recvd");
+				readNext = ((capturedImage)o).getCameraCapture();
+				setReadYet(false);
+			}
+		}
+		
+	}
+
+	@Override
+	public ImageLabel getImageLabel() {
+		return this.resultingLabel;
 	}
 
 }
