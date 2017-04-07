@@ -6,7 +6,10 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 import cameras.Camera;
+import cameras.Kinect;
 import cameras.LaptopCamera;
+import computervision.QRReader;
+import computervision.ResNet50;
 import visionPatterns.CameraProcessor;
 import visionPatterns.Classifier;
 
@@ -37,10 +40,16 @@ public class StartThreaded {
 	private CameraProcessor cameraProcessor;
 	
 	public void magic() {
-		//myCamera = new Kinect();
-		myCamera = new LaptopCamera();
+		myCamera = new Kinect();
+		//myCamera = new LaptopCamera();
 
-		cameraProcessor = new Classifier(myCamera.getCapturedImage());
+		
+		//new ResNet50();    //imagenet trained
+		//new GregggResNet();
+		//new QRReader();
+		//cameraProcessor = new Classifier(new QRReader(), myCamera.getCapturedImage());
+		cameraProcessor = new Classifier(new ResNet50(), myCamera.getCapturedImage());
+		
 		
 		CameraUI window = new CameraUI(myCamera.getPanel(), cameraProcessor);
 		
@@ -49,7 +58,7 @@ public class StartThreaded {
 		
 		window.getFrame().addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(WindowEvent arg0) {
+			public void windowClosed(WindowEvent arg0) {
 				myCamera.close();
 			}
 		});
