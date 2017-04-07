@@ -62,12 +62,13 @@ public class Kinect extends J4KSDK implements Camera{
 
 	public Kinect()
 	{
-		super();
-		initialize();
+		lastImage = new capturedImage();
 		timer = System.currentTimeMillis();
 		elapsed = 0.0;
 		frameCount = 0;
 		FPS = 0.0;
+		
+		initialize();
 	}
 
 	public Kinect(byte type)

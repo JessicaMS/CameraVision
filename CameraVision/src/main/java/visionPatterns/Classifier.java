@@ -19,13 +19,12 @@ public class Classifier implements Observer, CameraProcessor {
 	private BufferedImage lastImage;
 	private volatile boolean requestNew;
 
-	public Classifier(Observable observable) {
+	public Classifier(ImageProcessor myImgProcessor, capturedImage observable) {
 		resultingLabel = new ImageLabel();
 		observable.addObserver(this);
 
-		//myImgProcessor = new ResNet50();    //imagenet trained
-		//myImgProcessor = new GregggResNet();
-		myImgProcessor = new QRReader();
+
+		this.myImgProcessor = myImgProcessor;
 
 		requestNew = false;
 		lastImage = null;

@@ -53,6 +53,7 @@ public class LaptopCamera implements Camera, WebcamListener {
 			webcam.addWebcamListener(this);
 		}
 		catch(Exception e){
+			System.out.println("Failed to initialize webcam!");
 			//IC.logError("Webcam Error", "Cannot add the webcam panel due to no webcam.", "Dashboard.java", "Dashboard()");	
 		}
 	}
