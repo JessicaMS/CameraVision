@@ -62,7 +62,7 @@ public class Image2Tensor {
 		
 		if(bufferedImage.getHeight() != height || bufferedImage.getWidth() != width) {
 			System.out.println("Automatically scaling image...");
-			imgResized = Scalr.resize(bufferedImage, Scalr.Method.ULTRA_QUALITY, Scalr.Mode.FIT_EXACT, height, width);	
+			imgResized = Scalr.resize(bufferedImage, Scalr.Method.QUALITY, Scalr.Mode.FIT_EXACT, height, width);	
 		} else {
 			System.out.println("Warning:  Already resized");
 			imgResized = bufferedImage;

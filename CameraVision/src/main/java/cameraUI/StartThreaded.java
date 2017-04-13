@@ -5,9 +5,13 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import cameras.Camera;
 import cameras.Kinect;
 import cameras.LaptopCamera;
+import computervision.GregggResNet;
 import computervision.QRReader;
 import computervision.ResNet50;
 import visionPatterns.CameraProcessor;
@@ -40,18 +44,16 @@ public class StartThreaded {
 	private CameraProcessor cameraProcessor;
 	
 	public void magic() {
-		myCamera = new Kinect();
-		//myCamera = new LaptopCamera();
+		//myCamera = new Kinect();
+		myCamera = new LaptopCamera();
 
+		cameraProcessor = new Classifier(new QRReader(), myCamera.getCapturedImage());
+		//cameraProcessor = new Classifier(new ResNet50(), myCamera.getCapturedImage());
+		//cameraProcessor = new Classifier(new GregggResNet(), myCamera.getCapturedImage());
 		
-		//new ResNet50();    //imagenet trained
-		//new GregggResNet();
-		//new QRReader();
-		//cameraProcessor = new Classifier(new QRReader(), myCamera.getCapturedImage());
-		cameraProcessor = new Classifier(new ResNet50(), myCamera.getCapturedImage());
+		Controller myController = new TestController(cameraProcessor);
 		
-		
-		CameraUI window = new CameraUI(myCamera.getPanel(), cameraProcessor);
+		CameraUI window = new CameraUI(myCamera.getPanel(), myController.getLabelData());
 		
 
 		JFrameThread2 windowThread = new JFrameThread2(window.getFrame());
@@ -59,11 +61,25 @@ public class StartThreaded {
 		window.getFrame().addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent arg0) {
+				myController.stopThread();
 				myCamera.close();
 			}
 		});
+		
+		window.getChckbxCapture().addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				if(window.getChckbxCapture().isSelected()) {
+					myController.unpauseThread();
+				} else {
+					myController.pauseThread();
+				}
+			}
+		});
+		
 
 		EventQueue.invokeLater(windowThread);
+		
+		myController.startThread();
 		
 	}
 	

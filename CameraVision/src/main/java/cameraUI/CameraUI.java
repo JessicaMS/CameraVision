@@ -8,13 +8,16 @@ import java.awt.Insets;
 import computervision.ImageLabel;
 import visionPatterns.CameraProcessor;
 import java.text.DecimalFormat;
+import java.util.Observable;
+import java.util.Observer;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
-public class CameraUI {
+public class CameraUI implements Observer {
 
 	/**
 	 * 
@@ -23,15 +26,13 @@ public class CameraUI {
 	private JFrame frame;
 	private static DecimalFormat df2 = new DecimalFormat("###.##");
 
+	//private ControllerData myData;
+	
 	private JLabel lblFps;
 	private JCheckBox chckbxCapture;
-	private Thread mainThread;
-
 	private JPanel cameraPanel;
 	private JLabel lblImageLabel;
-	private CameraProcessor cameraProcessor;
 	
-	private volatile boolean threadRunning;
 
 
 	public JFrame getFrame() {
@@ -41,10 +42,10 @@ public class CameraUI {
 	/**
 	 * Create the application.
 	 */
-	public CameraUI(JPanel cameraPanel, CameraProcessor cameraProcessor) {
-		this.cameraProcessor = cameraProcessor;
+	public CameraUI(JPanel cameraPanel, ControllerData myData) {
 		this.cameraPanel = cameraPanel;
-		threadRunning = false;
+		
+		myData.addObserver(this);
 		initialize();
 	}	
 
@@ -57,13 +58,6 @@ public class CameraUI {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		//		frame.addWindowListener(new WindowAdapter() {
-		//			@Override
-		//			public void windowClosing(WindowEvent arg0) {
-		//				myClassifier.stopThread();
-		//				myCamera.close();
-		//			}
-		//		});
 		frame.setBounds(100, 100, 765, 522);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -105,64 +99,18 @@ public class CameraUI {
 		frame.getContentPane().add(chckbxCapture, gbc_chckbxCapture);
 
 
-		chckbxCapture.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				if(chckbxCapture.isSelected()) {
-					startThread();
-				} else {
-					stopThread();
-				}
-			}
-		});
+
 		
+	}
+
+	@Override
+	public void update(Observable o, Object arg1) {
+		if(o instanceof ControllerData) {
+			this.lblImageLabel.setText(((ControllerData)o).getLocationName());
+		}
 		
-		this.createThread();
 	}
 
-	public void createThread() {
-		mainThread = new Thread(){
-			public void run(){
-				ImageLabel result = null;
-				String tourLocData="";
-				while(threadRunning){
-					System.out.println("scan");
-					result = cameraProcessor.scanImage();
-					if(!result.getLabelName().equals("(None)")) {
-						tourLocData=result.getLabelName();
-						System.out.println(tourLocData);
-						//							tourLocData=IC.requestTLData(tourLocData);
-						//							IC.speak(tourLocData);
-						result.setLabelName("None)");
 
-					} else {
-						System.out.println("None, sleep");
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-					
-				}
-			}
-		};
-	}
-
-	void startThread() {
-		if(threadRunning == false) {
-			System.out.println("turn on");
-			this.threadRunning = true;
-			mainThread.start();
-		}
-	}
-
-	void stopThread() {
-		if (threadRunning == true) {
-			System.out.println("turn off");
-			this.threadRunning = false;
-		}
-
-	}
 
 }
