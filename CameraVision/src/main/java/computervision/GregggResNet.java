@@ -82,30 +82,27 @@ public class GregggResNet implements ImageProcessor {
 		System.out.println("Model Loaded and initalized");
 
 
-//		try {
-//			runTests(graphNet);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		try {
+			runTests(graphNet);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
 	public void runTests(ComputationGraph graphNet) throws IOException {
 		String fileDir = "./nnmodel/testdata/";
 		ArrayList<String> files = new ArrayList<String>();
-
 		files.add("A235_set3_203.jpg");
 		files.add("csdept_set2_276.jpg");
 		files.add("227-230_set2_542.jpg");
-		files.add("224.jpg");
+		files.add("231_set3_252.jpg");
 		files.add("224_near.jpg");
-		files.add("227.jpg");
 		files.add("227_far.jpg");
 		files.add("227_mid.jpg");
 		files.add("275.jpg");
 		files.add("276_close.jpg");
-		files.add("A235.jpg");
 		files.add("278_close.jpg");
 		files.add("278_far.jpg");
 		files.add("a235_close.jpg");
