@@ -1,6 +1,6 @@
-package cameraUI;
+package controlPolicies;
 
-public interface Controller extends Runnable{
+public interface ControlPolicy extends Runnable{
 	
 	ControllerData getLabelData();
 	

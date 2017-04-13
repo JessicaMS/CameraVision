@@ -11,11 +11,14 @@ import javax.swing.event.ChangeListener;
 import cameras.Camera;
 import cameras.Kinect;
 import cameras.LaptopCamera;
+import computervision.CameraObserver;
+import computervision.Classifier;
 import computervision.GregggResNet;
 import computervision.QRReader;
+import computervision.Recorder;
 import computervision.ResNet50;
-import visionPatterns.CameraProcessor;
-import visionPatterns.Classifier;
+import controlPolicies.ControlPolicy;
+import controlPolicies.TestController;
 
 
 class JFrameThread2 implements Runnable {
@@ -39,19 +42,21 @@ class JFrameThread2 implements Runnable {
 	
 }
 
-public class StartThreaded {
+public class Start {
 	private Camera myCamera;
-	private CameraProcessor cameraProcessor;
+	private Classifier cameraClassifier;
 	
 	public void magic() {
 		//myCamera = new Kinect();
 		myCamera = new LaptopCamera();
+		
+		Recorder myRecorder = new Recorder(myCamera.getCapturedImage());
 
-		cameraProcessor = new Classifier(new QRReader(), myCamera.getCapturedImage());
+		cameraClassifier = new Classifier(new QRReader(), myCamera.getCapturedImage());
 		//cameraProcessor = new Classifier(new ResNet50(), myCamera.getCapturedImage());
 		//cameraProcessor = new Classifier(new GregggResNet(), myCamera.getCapturedImage());
 		
-		Controller myController = new TestController(cameraProcessor);
+		ControlPolicy myController = new TestController(cameraClassifier, myRecorder);
 		
 		CameraUI window = new CameraUI(myCamera.getPanel(), myController.getLabelData());
 		
@@ -84,7 +89,7 @@ public class StartThreaded {
 	}
 	
 	public static void main(String[] args) {
-		StartThreaded funtime = new StartThreaded();
+		Start funtime = new Start();
 		funtime.magic();
 	}
 }

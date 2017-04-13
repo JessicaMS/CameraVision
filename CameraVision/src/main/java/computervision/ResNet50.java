@@ -16,7 +16,7 @@ import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.VGG16ImagePreProcessor;
 import org.nd4j.linalg.factory.Nd4j;
 
-public class ResNet50 implements ImageProcessor {
+public class ResNet50 implements ClassificationStrategy {
 
 	private static final String modelJsonFilepath = "./nnmodel/";
 	private static final String weightsHdf5Filepath = "./nnmodel/";

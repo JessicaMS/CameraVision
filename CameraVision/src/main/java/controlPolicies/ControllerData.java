@@ -1,4 +1,4 @@
-package cameraUI;
+package controlPolicies;
 
 import java.util.Observable;
 

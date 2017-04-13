@@ -16,7 +16,7 @@ import com.google.zxing.common.HybridBinarizer;
 
 import computervision.ImageLabel;
 
-public class QRReader implements ImageProcessor  {
+public class QRReader implements ClassificationStrategy  {
 	protected Map<DecodeHintType, Object> hints = new EnumMap<DecodeHintType, Object>(DecodeHintType.class);
 
 	private MultiFormatReader reader;

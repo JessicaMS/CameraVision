@@ -5,8 +5,11 @@ import javax.swing.JFrame;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+
+import computervision.CameraObserver;
 import computervision.ImageLabel;
-import visionPatterns.CameraProcessor;
+import controlPolicies.ControllerData;
+
 import java.text.DecimalFormat;
 import java.util.Observable;
 import java.util.Observer;

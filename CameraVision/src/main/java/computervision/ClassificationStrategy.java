@@ -2,7 +2,7 @@ package computervision;
 
 import java.awt.image.BufferedImage;
 
-public interface ImageProcessor {
+public interface ClassificationStrategy {
 
 	ImageLabel scanImage(BufferedImage imgInput);
 }

@@ -1,4 +1,4 @@
-package visionPatterns;
+package computervision;
 
 import java.awt.image.BufferedImage;
 import java.util.Observable;
@@ -6,12 +6,9 @@ import java.util.Observer;
 import java.util.concurrent.Semaphore;
 
 import cameras.capturedImage;
-import computervision.ImageLabel;
-import computervision.ImageProcessor;
-import computervision.QRReader;
 
-public class Classifier implements Observer, CameraProcessor {
-	private ImageProcessor myImgProcessor;
+public class Classifier implements CameraObserver {
+	private ClassificationStrategy myImgProcessor;
 	private ImageLabel resultingLabel;
 
 	private Semaphore mutex = new Semaphore(1);
@@ -19,10 +16,9 @@ public class Classifier implements Observer, CameraProcessor {
 	private BufferedImage lastImage;
 	private volatile boolean requestNew;
 
-	public Classifier(ImageProcessor myImgProcessor, capturedImage observable) {
+	public Classifier(ClassificationStrategy myImgProcessor, capturedImage observable) {
 		resultingLabel = new ImageLabel();
 		observable.addObserver(this);
-
 
 		this.myImgProcessor = myImgProcessor;
 
@@ -42,9 +38,7 @@ public class Classifier implements Observer, CameraProcessor {
 
 	}
 
-
-	@Override
-	public ImageLabel scanImage() {
+	public ImageLabel processImage() {
 		long start, elapsed;
 		requestNew = true;
 		while(requestNew == true) { 
@@ -54,7 +48,6 @@ public class Classifier implements Observer, CameraProcessor {
 				e.printStackTrace();
 			} 
 		}
-		System.out.println("continue");
 		try {
 			mutex.acquire();
 			start = System.currentTimeMillis();

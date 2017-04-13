@@ -1,14 +1,13 @@
-package cameraUI;
+package controlPolicies;
 
-import javax.swing.JPanel;
-
+import computervision.Classifier;
 import computervision.ImageLabel;
-import visionPatterns.CameraProcessor;
+import computervision.Recorder;
 
-public class TestController implements Controller {
-	private CameraProcessor cameraProcessor;
+public class TestController implements ControlPolicy {
+	private Classifier cameraProcessor;
 	private ControllerData labelData;
-
+	private Recorder myRecorder;
 
 	private Thread mainThread;
 
@@ -16,10 +15,11 @@ public class TestController implements Controller {
 	private volatile boolean paused;
 	
 
-	public TestController(CameraProcessor cameraProcessor) {
+	public TestController(Classifier cameraProcessor, Recorder myRecorder) {
 		this.cameraProcessor = cameraProcessor;
 		mainThread = new Thread(this);
 		labelData = new ControllerData();
+		this.myRecorder = myRecorder;
 
 		paused = true;
 		running = false;
@@ -31,7 +31,6 @@ public class TestController implements Controller {
 	
 	public void startThread() {
 		if(running == false) {
-			System.out.println("turn on");
 			this.running = true;
 			mainThread.start();
 		}
@@ -39,14 +38,13 @@ public class TestController implements Controller {
 
 	public void stopThread() {
 		if (running == true) {
-			System.out.println("turn off");
+			System.out.println("Control Policy ended.");
 			this.running = false;
 		}
 
 	}
 
 	public void run() {
-		// TODO Auto-generated method stub
 		ImageLabel result = null;
 		String tourLocData="";
 		while(running){
@@ -59,7 +57,9 @@ public class TestController implements Controller {
 				}
 			}
 			System.out.println("scan");
-			result = cameraProcessor.scanImage();
+			myRecorder.processImage();
+			
+			result = cameraProcessor.processImage();
 			if(!result.getLabelName().equals("(None)")) {
 				tourLocData=result.getLabelName();
 				System.out.println(tourLocData);
@@ -69,7 +69,7 @@ public class TestController implements Controller {
 				labelData.setLocationName(result.getLabelName());
 
 			} else {
-				labelData.setLocationName(result.getLabelName() + "(debug)");
+				//labelData.setLocationName(result.getLabelName() + "(debug)");
 				System.out.println("None, sleep");
 				try {
 					Thread.sleep(1000);

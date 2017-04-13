@@ -2,3 +2,4 @@
 .recommenders
 RemoteSystemsTempFiles
 CameraVision/nnmodel/testdata/*.jpg
+CameraVision/captures/*.jpg
