@@ -16,7 +16,7 @@ import java.util.HashMap;
 
 import javax.imageio.ImageIO;
 
-public class GregggResNet implements ImageProcessor {
+public class GregggResNet implements ClassificationStrategy {
 	private static final String modelJsonFilepath = "./nnmodel/";
 	private static final String weightsHdf5Filepath = "./nnmodel/";
     private static ArrayList<String> labels = null;

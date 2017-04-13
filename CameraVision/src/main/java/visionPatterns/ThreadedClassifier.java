@@ -7,12 +7,12 @@ import java.util.Observer;
 import cameras.capturedImage;
 import computervision.GregggResNet;
 import computervision.ImageLabel;
-import computervision.ImageProcessor;
+import computervision.ClassificationStrategy;
 import computervision.QRReader;
 import computervision.ResNet50;
 
 public class ThreadedClassifier implements Observer, ThreadedCameraProcessor {
-	private ImageProcessor myImgProcessor;
+	private ClassificationStrategy myImgProcessor;
 	private ImageLabel resultingLabel;
 
 	private BufferedImage readNext;
