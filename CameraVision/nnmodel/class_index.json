@@ -1,9 +1,16 @@
-{"0": "224", 
-"1": "227-230", 
-"2": "231", 
-"3": "275", 
-"4": "276", 
-"5": "278", 
-"6": "A235", 
-"7": "csdept", 
-"8": "rescue"}
+{
+    "0": "224, Unix Laboratory",
+    "1": "227-230",
+    "2": "231, Innovative Technology Laboratory",
+    "3": "232, Network Administration Laboratory",
+    "4": "234",
+    "5": "275 Computer Science Dept Office",
+    "6": "276 Data Server Closet",
+    "7": "278 Student Resource Center",
+    "8": "A235 Stairway",
+    "9": "Accessible Restroom",
+    "10": "Computer Science Department Sign",
+    "11": "Hallway",
+    "12": "Rescue Sign",
+    "13": "door"
+}
