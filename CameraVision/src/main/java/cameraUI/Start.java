@@ -19,6 +19,7 @@ import computervision.Recorder;
 import computervision.ResNet50;
 import controlPolicies.ControlPolicy;
 import controlPolicies.TestController;
+import controlPolicies.TestController2;
 
 
 class JFrameThread2 implements Runnable {
@@ -56,7 +57,7 @@ public class Start {
 		//cameraProcessor = new Classifier(new ResNet50(), myCamera.getCapturedImage());
 		//cameraProcessor = new Classifier(new GregggResNet(), myCamera.getCapturedImage());
 		
-		ControlPolicy myController = new TestController(cameraClassifier, myRecorder);
+		ControlPolicy myController = new TestController2(cameraClassifier);
 		
 		CameraUI window = new CameraUI(myCamera.getPanel(), myController.getLabelData());
 		
