@@ -23,7 +23,9 @@ public class Recorder implements CameraObserver {
 		lastImage = null;
 	}
 	
-	
+	/*
+	 * @param BufferedImage newImage If requestNew flag is set, a new image can passed and loaded to be processed next
+	 */
 	public synchronized void updateBufferedImage(BufferedImage newImage) {
 		if (requestNew) {
 			if (mutex.tryAcquire()) {
@@ -36,6 +38,9 @@ public class Recorder implements CameraObserver {
 
 	}
 	
+	/**
+	 * @param lastImage receives a BufferedImage to be saved to a new File with the filename being a current timestamp
+	 */
 	private void saveImage(BufferedImage lastImage) {
 		String fileName = String.valueOf(System.currentTimeMillis());
 		File outputfile = new File("./captures/" + fileName + ".jpg");
@@ -47,6 +52,11 @@ public class Recorder implements CameraObserver {
 		}
 	}
 
+	/**
+	 * Requests that a new image is recorded by saving it to a file.  
+	 * Allows new observable BufferedImage to be received, and waits 
+	 * until new observable data is received, then passes it to a save method.
+	 */
 	public void processImage() {
 		long start, elapsed;
 		requestNew = true;
@@ -72,8 +82,6 @@ public class Recorder implements CameraObserver {
 		}
 
 	}
-
-
 
 
 

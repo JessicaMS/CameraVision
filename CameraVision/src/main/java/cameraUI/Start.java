@@ -18,6 +18,7 @@ import computervision.QRReader;
 import computervision.Recorder;
 import computervision.ResNet50;
 import controlPolicies.ControlPolicy;
+import controlPolicies.JoystickImageRecorder;
 import controlPolicies.TestController;
 import controlPolicies.TestController2;
 
@@ -51,13 +52,12 @@ public class Start {
 		//myCamera = new Kinect();
 		myCamera = new LaptopCamera();
 		
-		Recorder myRecorder = new Recorder(myCamera.getCapturedImage());
-
-		cameraClassifier = new Classifier(new QRReader(), myCamera.getCapturedImage());
-		//cameraProcessor = new Classifier(new ResNet50(), myCamera.getCapturedImage());
-		//cameraProcessor = new Classifier(new GregggResNet(), myCamera.getCapturedImage());
 		
-		ControlPolicy myController = new TestController2(cameraClassifier);
+		
+		ControlPolicy myController = new JoystickImageRecorder(myCamera);
+		
+		
+		
 		
 		CameraUI window = new CameraUI(myCamera.getPanel(), myController.getLabelData());
 		

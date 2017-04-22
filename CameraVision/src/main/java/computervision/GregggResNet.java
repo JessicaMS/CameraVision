@@ -67,8 +67,8 @@ public class GregggResNet implements ClassificationStrategy {
 
 
 	private void loadNetwork(){
-		String modelJsonFilename = modelJsonFilepath + "signs_res.json";
-		String weightsHdf5Filename = weightsHdf5Filepath + "signs_res.h5";
+		String modelJsonFilename = modelJsonFilepath + "greggg_indoor2.json";
+		String weightsHdf5Filename = weightsHdf5Filepath + "greggg_indoor2.h5";
 
 		this.labels = this.getLabels();
 		try {
@@ -94,25 +94,34 @@ public class GregggResNet implements ClassificationStrategy {
 	public void runTests(ComputationGraph graphNet) throws IOException {
 		String fileDir = "./nnmodel/testdata/";
 		ArrayList<String> files = new ArrayList<String>();
-		files.add("A235_set3_203.jpg");
-		files.add("csdept_set2_276.jpg");
-		files.add("227-230_set2_542.jpg");
-		files.add("231_set3_252.jpg");
-		files.add("224_near.jpg");
-		files.add("227_far.jpg");
-		files.add("227_mid.jpg");
-		files.add("275.jpg");
-		files.add("276_close.jpg");
-		files.add("278_close.jpg");
-		files.add("278_far.jpg");
-		files.add("a235_close.jpg");
-		files.add("a235_mid.jpg");
-		files.add("cs_mid.jpg");
-		files.add("csdept_near.jpg");
-		files.add("rescue_close.jpg");
-		files.add("rescue_far.jpg");
-
-
+	    files.add("224_close.JPG");
+	    files.add("224_mid.JPG");
+	    files.add("224_near.jpg");
+	    files.add("224.JPG");
+	    files.add("227-230_set2_542.jpg");
+	    files.add("227close.JPG");
+	    files.add("227_far.jpg");
+	    files.add("227_mid2.JPG");
+	    files.add("227_mid.jpg");
+	    files.add("231_close.JPG");
+	    files.add("231.JPG");
+	    files.add("231_set3_252.jpg");
+	    files.add("231_veryclose.JPG");
+	    files.add("275.jpg");
+	    files.add("276_close.jpg");
+	    files.add("276.JPG");
+	    files.add("278_close.jpg");
+	    files.add("278_far.jpg");
+	    files.add("a235_close.jpg");
+	    files.add("a235_mid.jpg");
+	    files.add("A235_set3_203.jpg");
+	    files.add("csdept_near.jpg");
+	    files.add("csdept_set2_276.jpg");
+	    files.add("cs_mid.jpg");
+	    files.add("rescue_close.jpg");
+	    files.add("rescue_far.jpg");
+	    
+	    
 		for(String fileName :files) {
 			BufferedImage imgInput = null;
 			imgInput = ImageIO.read(new File(fileDir+fileName));
@@ -132,7 +141,7 @@ public class GregggResNet implements ClassificationStrategy {
 		INDArray[] output = this.graphNet.output(imageTensor);
 
 		results = (decodePredictions(output[0]));
-		System.out.println(results);
+		System.out.println(results.get(0).toString());
 		
 		return results.get(0);
 
