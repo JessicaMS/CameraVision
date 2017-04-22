@@ -26,7 +26,7 @@ public class ImageLabel extends Observable {
 	}
 	
 	public String toString() {
-		return String.format("%3f", probability) + "%, " + this.labelName; 
+		return this.labelName + ": " + String.format("%3f", probability) + "%"; 
 	}
 
 	public double getProbability() {
